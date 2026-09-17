@@ -42,5 +42,36 @@
  *   // => "INVALID PASS"
  */
 export function generateLocalPass(passenger) {
-  // Your code here
+  if (!passenger || typeof passenger !== "object" || passenger === null) {
+    return "INVALID PASS";
+  }
+  const { name, from, to, classType } = passenger;
+  if (!name || typeof name !== "string" || name.trim() === "") {
+    return "INVALID PASS";
+  }
+  if (!from || typeof from !== "string" || from.trim() === "") {
+    return "INVALID PASS";
+  }
+  if (!to || typeof to !== "string" || to.trim() === "") {
+    return "INVALID PASS";
+  }
+  if (!classType || typeof classType !== "string" || classType.trim() === "") {
+    return "INVALID PASS";
+  }
+  const lowerClassType = classType.toLowerCase();
+  if (lowerClassType !== "first" && lowerClassType !== "second") {
+    return "INVALID PASS";
+  }
+
+  const passId = lowerClassType.charAt(0).toUpperCase() + from.slice(0, 3).toUpperCase() + to.slice(0, 3).toUpperCase();
+  const upperName = name.toUpperCase();
+  const titleCaseFrom = from.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+  const titleCaseTo = to.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+  return `MUMBAI LOCAL PASS
+---
+Name: ${upperName}
+From: ${titleCaseFrom}
+To: ${titleCaseTo}
+Class: ${lowerClassType.toUpperCase()}
+Pass ID: ${passId}`;
 }
