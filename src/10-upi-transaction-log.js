@@ -47,5 +47,54 @@
  *   //      frequentContact: "Swiggy", allAbove100: false, hasLargeTransaction: true }
  */
 export function analyzeUPITransactions(transactions) {
-  // Your code here
+  if (!Array.isArray(transactions) || transactions.length === 0) {
+    return null;
+  }
+
+  const validTransactions = transactions.filter(
+    (transaction) =>
+      typeof transaction.amount === "number" &&
+      transaction.amount > 0 &&
+      (transaction.type === "credit" || transaction.type === "debit")
+  );
+
+  if (validTransactions.length === 0) {
+    return null;
+  }
+
+  const totalCredit = validTransactions.filter((t) => t.type === "credit").reduce((sum, t) => sum + t.amount, 0);
+  const totalDebit = validTransactions.filter((t) => t.type === "debit").reduce((sum, t) => sum + t.amount, 0);
+  const netBalance = totalCredit - totalDebit;
+  const transactionCount = validTransactions.length;
+  const avgTransaction = Math.round(validTransactions.reduce((sum, t) => sum + t.amount, 0) / transactionCount);
+  const highestTransaction = validTransactions.reduce((maxTxn, current) => (current.amount > maxTxn.amount ? current : maxTxn), validTransactions[0]);
+  const categoryBreakdown = validTransactions.reduce((acc, txn) => {
+    acc[txn.category] = (acc[txn.category] || 0) + txn.amount;
+    return acc;
+  }, {});
+  const contactFrequency = validTransactions.reduce((acc, txn) => {
+    acc[txn.to] = (acc[txn.to] || 0) + 1;
+    return acc;
+  }, {});
+  const frequentContact = Object.entries(contactFrequency).reduce((maxContact, [contact, count]) => {
+    if (count > maxContact.count) {
+      return { contact, count };
+    }
+    return maxContact;
+  }, { contact: null, count: 0 }).contact;
+  const allAbove100 = validTransactions.every((t) => t.amount > 100);
+  const hasLargeTransaction = validTransactions.some((t) => t.amount >= 5000);
+
+  return {
+    totalCredit,
+    totalDebit,
+    netBalance,
+    transactionCount,
+    avgTransaction,
+    highestTransaction,
+    categoryBreakdown,
+    frequentContact,
+    allAbove100,
+    hasLargeTransaction,
+  };
 }
